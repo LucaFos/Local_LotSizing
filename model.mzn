@@ -1,5 +1,3 @@
-%include "globals.mzn";
-
 int: Periods;
 int: Items;
 array[1..Items,1..Periods] of 0..1: Demands;
@@ -23,6 +21,10 @@ constraint
 constraint
       forall (i in 1..Items, j in 1..Periods)
                 (AccumulatedDemands[i,j] <= sum (k in 1..j) (if Sol[k]=i-1 then 1 else 0 endif));
+
+constraint
+     forall (i in 1..Items)
+               (AccumulatedDemands[i,Periods] == sum (j in 1..Periods) (if Sol[j]==i-1 then 1 else 0 endif));
 
 
 
