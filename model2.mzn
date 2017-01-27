@@ -15,10 +15,13 @@ constraint
      forall (i in 1..Items)
                (sum (k in 1..Periods) (Demands[i,k]) == sum (j in 1..Periods) (if Sol[j]==i-1 then 1 else 0 endif));
 
+constraint
+     forall (i in 1..Items, j in 1..Periods)
+               (sum (k in j..Periods) (Demands[i,k]) == 0 -> Sol[j] != i-1);
 
 
 
-solve :: int_search(Sol, first_fail, indomain_random, complete)
+solve :: int_search(Sol, input_order, indomain_random, complete)
 minimize (
           sum (i in 1..Periods-1) (if Sol[i] != Sol[i+1] then SetupCosts[Sol[i]+1,Sol[i+1]+1] else 0 endif)
           +
