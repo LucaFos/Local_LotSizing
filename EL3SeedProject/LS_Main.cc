@@ -1,4 +1,4 @@
-#include "XYZ_Helpers.hh"
+#include "LS_Helpers.hh"
 
 using namespace EasyLocal::Debug;
 
@@ -24,42 +24,42 @@ int main(int argc, const char* argv[])
       cout << "Error: --main::instance filename option must always be set" << endl;
       return 1;
     }
-  XYZ_Input in(instance);
+  LS_Input in(instance);
 
   if (seed.IsSet())
     Random::Seed(seed);
   
   // cost components: second parameter is the cost, third is the type (true -> hard, false -> soft)
-  XYZ_CostComponent1 cc1(in, 1, true);
-  XYZ_CostComponent2 cc2(in, 1, true);
+  LS_CostComponent1 cc1(in, 1, true);
+  LS_CostComponent2 cc2(in, 1, true);
  
-  XYZ_MoveDeltaCostComponent1 dcc1(in, cc1);
-  XYZ_MoveDeltaCostComponent2 dcc2(in, cc2);
+  LS_MoveDeltaCostComponent1 dcc1(in, cc1);
+  LS_MoveDeltaCostComponent2 dcc2(in, cc2);
 
   // helpers
-  XYZ_StateManager XYZ_sm(in);
-  XYZ_MoveNeighborhoodExplorer XYZ_nhe(in, XYZ_sm);
+  LS_StateManager LS_sm(in);
+  LS_MoveNeighborhoodExplorer LS_nhe(in, LS_sm);
 
-  XYZ_OutputManager XYZ_om(in);
+  LS_OutputManager LS_om(in);
   
   // All cost components must be added to the state manager
-  XYZ_sm.AddCostComponent(cc1);
-  XYZ_sm.AddCostComponent(cc2);
+  LS_sm.AddCostComponent(cc1);
+  LS_sm.AddCostComponent(cc2);
   
   // All delta cost components must be added to the neighborhood explorer
-  XYZ_nhe.AddDeltaCostComponent(dcc1);
-  XYZ_nhe.AddDeltaCostComponent(dcc2);
+  LS_nhe.AddDeltaCostComponent(dcc1);
+  LS_nhe.AddDeltaCostComponent(dcc2);
   
   // runners
-  HillClimbing<XYZ_Input, XYZ_State, XYZ_Move> XYZ_hc(in, XYZ_sm, XYZ_nhe, "XYZ_MoveHillClimbing");
-  SteepestDescent<XYZ_Input, XYZ_State, XYZ_Move> XYZ_sd(in, XYZ_sm, XYZ_nhe, "XYZ_MoveSteepestDescent");
-  SimulatedAnnealing<XYZ_Input, XYZ_State, XYZ_Move> XYZ_sa(in, XYZ_sm, XYZ_nhe, "XYZ_MoveSimulatedAnnealing");
+  HillClimbing<LS_Input, LS_State, LS_Move> LS_hc(in, LS_sm, LS_nhe, "LS_MoveHillClimbing");
+  SteepestDescent<LS_Input, LS_State, LS_Move> LS_sd(in, LS_sm, LS_nhe, "LS_MoveSteepestDescent");
+  SimulatedAnnealing<LS_Input, LS_State, LS_Move> LS_sa(in, LS_sm, LS_nhe, "LS_MoveSimulatedAnnealing");
 
   // tester
-  Tester<XYZ_Input, XYZ_Output, XYZ_State> tester(in,XYZ_sm,XYZ_om);
-  MoveTester<XYZ_Input, XYZ_Output, XYZ_State, XYZ_Move> swap_move_test(in,XYZ_sm,XYZ_om,XYZ_nhe, "XYZ_Move move", tester); 
+  Tester<LS_Input, LS_Output, LS_State> tester(in,LS_sm,LS_om);
+  MoveTester<LS_Input, LS_Output, LS_State, LS_Move> swap_move_test(in,LS_sm,LS_om,LS_nhe, "LS_Move move", tester); 
 
-  SimpleLocalSearch<XYZ_Input, XYZ_Output, XYZ_State> XYZ_solver(in, XYZ_sm, XYZ_om, "XYZ solver");
+  SimpleLocalSearch<LS_Input, LS_Output, LS_State> LS_solver(in, LS_sm, LS_om, "LS solver");
   if (!CommandLineParameters::Parse(argc, argv, true, false))
     return 1;
 
@@ -75,19 +75,19 @@ int main(int argc, const char* argv[])
 
       if (method == string("SA"))
         {
-          XYZ_solver.SetRunner(XYZ_sa);
+          LS_solver.SetRunner(LS_sa);
         }
       else if (method == string("HC"))
         {
-          XYZ_solver.SetRunner(XYZ_hc);
+          LS_solver.SetRunner(LS_hc);
         }
       else // if (method.GetValue() == string("SD"))
         {
-          XYZ_solver.SetRunner(XYZ_sd);
+          LS_solver.SetRunner(LS_sd);
         }
-      auto result = XYZ_solver.Solve();
+      auto result = LS_solver.Solve();
 	  // result is a tuple: 0: solutio, 1: number of violations, 2: total cost, 3: computing time
-      XYZ_Output out = result.output;
+      LS_Output out = result.output;
       if (output_file.IsSet())
         { // write the output on the file passed in the command line
           ofstream os(static_cast<string>(output_file).c_str());
