@@ -24,9 +24,9 @@ LS_Input::LS_Input(string file_name)
     {
       is >> s;
       
-	  if (i==0 && p==0) demands[0][0] = stoi(s.substr(2,2));
-	  else if (p==0) demands[i][0] = stoi(s.substr(1,1));
-	  else demands[i][p] = stoi(s.substr(0,1));
+      if (i==0 && p==0) demands[0][0] = stoi(s.substr(2,2));
+      else if (p==0) demands[i][0] = stoi(s.substr(1,1));
+      else demands[i][p] = stoi(s.substr(0,1));
     }
   }
   
@@ -34,11 +34,10 @@ LS_Input::LS_Input(string file_name)
   is >> s >> s;
   for (i = 0; i < items; i++)
   {
-	is >> s;
+    is >> s;
 	
-	if (i==0) stocking_costs [0] = stoi(s.substr(1,s.length()-1));
-	else stocking_costs [i] = stoi(s.substr(0,s.length()-1));
-	
+    if (i==0) stocking_costs [0] = stoi(s.substr(1,s.length()-1));
+    else stocking_costs [i] = stoi(s.substr(0,s.length()-1));
   }
   
   setup_costs.resize(items, vector<unsigned>(items,false));
@@ -50,8 +49,8 @@ LS_Input::LS_Input(string file_name)
       is >> s;
       
       if (i1==0 && i2==0) setup_costs[0][0] = stoi(s.substr(2,s.length()-1));
-	  else if (i2==0) setup_costs[i1][0] = stoi(s.substr(1,s.length()-1));
-	  else setup_costs[i1][i2] = stoi(s.substr(0,s.length()));
+      else if (i2==0) setup_costs[i1][0] = stoi(s.substr(1,s.length()-1));
+      else setup_costs[i1][i2] = stoi(s.substr(0,s.length()));
     }
   }
   
@@ -81,13 +80,73 @@ LS_Input::LS_Input(string file_name)
     }
   }
   cout << endl;
+  
+  cout << "Periods = " << periods << ";\n";
+  cout << "Items = " << items << ";\n";
+  cout << "Demands = [";
+  for (i = 0; i < items; i++)
+  {
+    for (p = 0; p < periods; p++)
+    {
+      if (i!=0 && p==0) cout << "\n           |";
+      else if (p==0) cout << "|";
+      if (p==periods-1) cout << demands[i][p];
+      else cout << demands[i][p] << ", ";
+    }
+  }
+  cout << "|];\n";
+  cout << "StockingCosts = [";
+  for (i = 0; i < items-1; i++)
+    cout << stocking_costs[i] << ", ";
+  cout << stocking_costs[items-1] << "];\n";
+  cout << "SetupCosts = [";
+  for (i1 = 0; i1 < items; i1++)
+  {
+    for (i2 = 0; i2 < items; i2++)
+    {
+      if (i1!=0 && i2==0) cout << "\n              |";
+      else if (i2==0) cout << "|";
+      if (i2==items-1) cout << setup_costs[i1][i2];
+      else cout << setup_costs[i1][i2] << ", ";
+    }
+  }
+  cout << "|];\n";
   */
 }
 
-ostream& operator<<(ostream& os, const LS_Input& pa)
+ostream& operator<<(ostream& os, const LS_Input& bs)
 {
-  // Insert the code that write the input object (needed for debugging purposes)
-  throw logic_error("operator<<(ostream& os, const LS_Input& pa) not implemented yet");	
+  unsigned i, p, i1, i2;
+  os << "Periods = " << bs.periods << ";\n";
+  os << "Items = " << bs.items << ";\n";
+  os << "Demands = [";
+  for (i = 0; i < bs.items; i++)
+  {
+    for (p = 0; p < bs.periods; p++)
+    {
+      if (i!=0 && p==0) os << "\n           |";
+      else if (p==0) os << "|";
+      if (p==bs.periods-1) os << bs.demands[i][p];
+      else os << bs.demands[i][p] << ", ";
+    }
+  }
+  os << "|];\n";
+  os << "StockingCosts = [";
+  for (i = 0; i < bs.items-1; i++)
+    os << bs.stocking_costs[i] << ", ";
+  os << bs.stocking_costs[bs.items-1] << "];\n";
+  os << "SetupCosts = [";
+  for (i1 = 0; i1 < bs.items; i1++)
+  {
+    for (i2 = 0; i2 < bs.items; i2++)
+    {
+      if (i1!=0 && i2==0) os << "\n              |";
+      else if (i2==0) os << "|";
+      if (i2==bs.items-1) os << bs.setup_costs[i1][i2];
+      else os << bs.setup_costs[i1][i2] << ", ";
+    }
+  }
+  os << "|];\n";
   return os;
 }
 
@@ -112,7 +171,15 @@ ostream& operator<<(ostream& os, const LS_Output& out)
 
 istream& operator>>(istream& is, LS_Output& out)
 {
-  // Insert the code that reads the output object
-  throw logic_error("operator>>(istream& is, LS_Output& out) not implemented yet");	
+  unsigned p = 0;
+  string s;
+  is >> s;
+  while (s!="");
+  {
+    if (p==0) out.produced_items[0] = stoi(s.substr(1,s.length()-1));
+    else out.produced_items[p] = stoi(s.substr(0,s.length()-1));
+    is >> s;
+    p++;
+  }
   return is;
 }
