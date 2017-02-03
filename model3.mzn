@@ -21,7 +21,7 @@ constraint
                (sum (i in 1..Items)(i*X[(i-1)*Periods+t]) == Sol[t]+1);
 
 
-solve:: int_search(X, occurrence, indomain, complete) 
+solve:: int_search(X, occurrence, indomain_random, complete) 
        minimize (
           sum (i in 1..Items) (StockingCosts[i] * sum(t in 1..Periods, j in 1..t)(X[(i-1)*Periods+j]-Demands[i,j]))
           +
