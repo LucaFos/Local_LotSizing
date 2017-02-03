@@ -21,7 +21,7 @@ constraint
 
 
 
-solve :: int_search(Sol, input_order, indomain_random, complete)
+solve :: int_search(Sol, occurrence, indomain_random, complete)
 minimize (
           sum (i in 1..Periods-1) (if Sol[i] != Sol[i+1] then SetupCosts[Sol[i]+1,Sol[i+1]+1] else 0 endif)
           +
