@@ -11,8 +11,15 @@ class LS_State
 public:
   LS_State(const LS_Input &in);
   LS_State& operator=(const LS_State& s);
+  unsigned operator[](unsigned i) const { return produced_items[i]; }
+  unsigned& operator[](unsigned i) { return produced_items[i]; }
+  unsigned AccumulatedProducedItems(unsigned i, unsigned p) const { return accumulated_produced_items[i][p]; }
+  void SetItem(unsigned i, unsigned p);
+  
 protected:
-  const LS_Input & in;  
+  const LS_Input & in;
+  vector<unsigned> produced_items;
+  vector<vector<unsigned>> accumulated_produced_items;
 };
 
 class LS_Move
@@ -23,7 +30,7 @@ class LS_Move
   friend ostream& operator<<(ostream& os, const LS_Move& c);
   friend istream& operator>>(istream& is, LS_Move& c);
  public:
-  LS_Move();
+  LS_Move(unsigned pos1 = 0, unsigned pos2 = 0);
+  unsigned p1, p2;
 };
 #endif
-

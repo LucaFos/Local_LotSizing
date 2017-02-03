@@ -21,6 +21,7 @@ public:
   unsigned Demands(unsigned i, unsigned p) const { return demands[i][p]; }
   unsigned StockingCosts(unsigned i) const { return stocking_costs[i]; }
   unsigned SetupCosts(unsigned i1, unsigned i2) const {return setup_costs[i1][i2]; }
+  unsigned AccumulatedDemands(unsigned i, unsigned p) const { return accumulated_demands[i][p]; }
   
 protected:
   unsigned periods, items;
@@ -28,6 +29,7 @@ protected:
   vector<vector<unsigned>> demands;
   vector<unsigned> stocking_costs;
   vector<vector<unsigned>> setup_costs;
+  vector<vector<unsigned>> accumulated_demands;
 };
 
 class LS_Output 
@@ -39,7 +41,7 @@ public:
   LS_Output(const LS_Input& i);
   LS_Output& operator=(const LS_Output& out);
   unsigned ProducedItem(unsigned p) { return produced_items[p]; }
-  void SetItem(unsigned p, unsigned i) { produced_items[p] = i; }
+  void SetItem(unsigned i, unsigned p) { produced_items[p] = i; }
 
 protected:
   const LS_Input& in;

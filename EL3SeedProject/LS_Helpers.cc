@@ -1,48 +1,86 @@
 // File LS_Helpers.cc
 #include "LS_Helpers.hh"
 
-int LS_CostComponent1::ComputeCost(const LS_State& st) const
+int SetupCosts::ComputeCost(const LS_State& st) const
 {
   unsigned cost = 0;
-  // Insert the code that computes the cost for component 1 
-  // of state st
-	throw logic_error("LS_CostComponent1::ComputeCost not implemented yet");	
+  unsigned i;
+  for (i = 0; i < in.Periods()-1; i++)
+    if (st[i] != st[i+1])
+      cost += in.SetupCosts(st[i],st[i+1]);
   return cost;
 }
-          
-void LS_CostComponent1::PrintViolations(const LS_State& st, ostream& os) const
+
+void SetupCosts::PrintViolations(const LS_State& st, ostream& os) const
 {
-  // Insert the code that prints the violations of component 1 
-  // of state st
-	throw logic_error("LS_CostComponent1::PrintViolations not implemented yet");	
+  unsigned i;
+  for (i = 0; i < in.Periods()-1; i++)
+    if (st[i] != st[i+1])
+      os << "The cost of setting up item " <<  st[i+1] << " from item " << st[i] << " is " << in.SetupCosts(st[i],st[i+1]) << endl;
 }
 
-int LS_CostComponent2::ComputeCost(const LS_State& st) const
+int StockingCosts::ComputeCost(const LS_State& st) const
 { 
   unsigned cost = 0;
-  // Insert the code that computes the cost for component 2
-  // of state st
-	throw logic_error("LS_CostComponent2::ComputeCost not implemented yet");	
+  unsigned i, p;
+  for(i = 0; i < in.Items(); i++)
+  {
+    for(p = 0; p < in.Periods(); p++)
+    {
+      cost += (st.AccumulatedProducedItems(i,p) - in.AccumulatedDemands(i,p)) * in.StockingCosts(i);
+    }
+  }
   return cost;
 }
  
-void LS_CostComponent2::PrintViolations(const LS_State& st, ostream& os) const
+void StockingCosts::PrintViolations(const LS_State& st, ostream& os) const
 {
-  // Insert the code that prints the violations of component 1 
-  // of state st
-	throw logic_error("LS_CostComponent2::PrintViolations not implemented yet");	
+  unsigned i, p;
+  for(i = 0; i < in.Items(); i++)
+  {
+    for(p = 0; p < in.Periods(); p++)
+    {
+      os << "Stocking item " << i << " costs " << in.StockingCosts(i) << endl;
+    }
+  }
 }
 
 // constructor
 LS_StateManager::LS_StateManager(const LS_Input & pin) 
   : StateManager<LS_Input,LS_State>(pin, "LSStateManager")  {} 
 
-// initial state builder (random rooms)
+// initial state builder (random permutation)
 void LS_StateManager::RandomState(LS_State& st) 
 {
-// Insert the code that creates a random state in object st
-	throw logic_error("LS_StateManager::RandomState not implemented yet");	
-} 
+  unsigned i, p, periods;
+  vector<unsigned> occurrences;
+  occurrences.resize(in.Items());
+  /*for(i = 0; i < in.Items(); i++)
+    occurrences[i] = in.AccumulatedDemands(i,in.Periods()-1);
+  
+  i = 0;
+  periods = in.Periods()-1;
+  for(p = 0; p < in.Periods(); p++)
+  {
+    cout << periods << endl;
+    while (i < in.Items())
+    {
+      cout << "i: " << i << endl;
+      if (static_cast<unsigned>(Random::Int(0,periods)) < occurrences[i])
+      {
+        st.SetItem(i,p);
+        cout << "setting " << i << endl;
+        occurrences[i]--;
+        periods--;
+        break;
+      }
+      i++;
+    }
+    i = 0;
+  }
+  */
+  cout << st << endl;
+}
 
 bool LS_StateManager::CheckConsistency(const LS_State& st) const
 {
@@ -56,16 +94,21 @@ bool LS_StateManager::CheckConsistency(const LS_State& st) const
  * Output Manager Methods
  *****************************************************************************/
 
-void LS_OutputManager::InputState(LS_State& st, const LS_Output& LS) const 
+void LS_OutputManager::InputState(LS_State& st, const LS_Output& out) const 
 {
   // Insert the code that "translates" an output object to a state object
 	throw logic_error("LS_OutputManager::InputState not implemented yet");	
 }
 
-void LS_OutputManager::OutputState(const LS_State& st, LS_Output& LS) const 
+void LS_OutputManager::OutputState(const LS_State& st, LS_Output& out) const 
 {
+  unsigned p;
+  for(p = 0; p < in.Periods(); p++)
+  {
+    out.SetItem(st[p],p);
+  }
   // Insert the code that "translates" a state object to an output object
-	throw logic_error("LS_OutputManager::OutputState not implemented yet");	
+	//throw logic_error("LS_OutputManager::OutputState not implemented yet");	
 }
 
 

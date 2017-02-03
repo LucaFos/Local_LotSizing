@@ -11,19 +11,19 @@ using namespace EasyLocal::Core;
  * State Manager 
  ***************************************************************************/
 
-class LS_CostComponent1 : public CostComponent<LS_Input,LS_State> 
+class SetupCosts : public CostComponent<LS_Input,LS_State> 
 {
 public:
-  LS_CostComponent1(const LS_Input & in, int w, bool hard) :    CostComponent<LS_Input,LS_State>(in,w,hard,"LS_CostComponent1") 
+  SetupCosts(const LS_Input & in, int w, bool hard) :    CostComponent<LS_Input,LS_State>(in,w,hard,"LS_CostComponent1") 
   {}
   int ComputeCost(const LS_State& st) const;
   void PrintViolations(const LS_State& st, ostream& os = cout) const;
 };
 
-class  LS_CostComponent2: public CostComponent<LS_Input,LS_State> 
+class  StockingCosts: public CostComponent<LS_Input,LS_State> 
 {
 public:
-  LS_CostComponent2(const LS_Input & in, int w, bool hard) : CostComponent<LS_Input,LS_State>(in,w,hard,"LS_CostComponent2") 
+  StockingCosts(const LS_Input & in, int w, bool hard) : CostComponent<LS_Input,LS_State>(in,w,hard,"StockingCosts") 
   {}
   int ComputeCost(const LS_State& st) const;
   void PrintViolations(const LS_State& st, ostream& os = cout) const;
@@ -46,7 +46,7 @@ class LS_MoveDeltaCostComponent1
   : public DeltaCostComponent<LS_Input,LS_State,LS_Move>
 {
 public:
-  LS_MoveDeltaCostComponent1(const LS_Input & in, LS_CostComponent1& cc) 
+  LS_MoveDeltaCostComponent1(const LS_Input & in, SetupCosts& cc) 
     : DeltaCostComponent<LS_Input,LS_State,LS_Move>(in,cc,"LS_MoveDeltaCostComponent1") 
   {}
   int ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const;
@@ -56,7 +56,7 @@ class LS_MoveDeltaCostComponent2
   : public DeltaCostComponent<LS_Input,LS_State,LS_Move>
 {
 public:
-  LS_MoveDeltaCostComponent2(const LS_Input & in, LS_CostComponent2& cc) 
+  LS_MoveDeltaCostComponent2(const LS_Input & in, StockingCosts& cc) 
     : DeltaCostComponent<LS_Input,LS_State,LS_Move>(in,cc,"LS_MoveDeltaCostComponent2") 
   {}
   int ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const;

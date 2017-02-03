@@ -17,6 +17,7 @@ LS_Input::LS_Input(string file_name)
   items = stoi(s.substr(0,s.length()));
   
   demands.resize(items, vector<unsigned>(periods,false));
+  accumulated_demands.resize(items, vector<unsigned>(periods,false));
   is >> s >> s;
   for (i = 0; i < items; i++)
   {
@@ -24,9 +25,21 @@ LS_Input::LS_Input(string file_name)
     {
       is >> s;
       
-      if (i==0 && p==0) demands[0][0] = stoi(s.substr(2,2));
-      else if (p==0) demands[i][0] = stoi(s.substr(1,1));
-      else demands[i][p] = stoi(s.substr(0,1));
+      if (i==0 && p==0)
+      {
+        demands[0][0] = stoi(s.substr(2,2));
+        accumulated_demands[0][0] = stoi(s.substr(2,2));
+      }
+      else if (p==0)
+      {
+        demands[i][0] = stoi(s.substr(1,1));
+        accumulated_demands[i][0] = stoi(s.substr(1,1));
+      }
+      else
+      {
+        demands[i][p] = stoi(s.substr(0,1));
+        accumulated_demands[i][p] = accumulated_demands[i][p-1] + stoi(s.substr(0,1));
+      }
     }
   }
   
@@ -59,22 +72,33 @@ LS_Input::LS_Input(string file_name)
   /*
   cout << "periods: " << periods << endl;
   cout << "items: " << items << endl;
+  
   cout << "demands:\n";
   for (i = 0; i < items; i++)
   {  
-	for (p = 0; p < periods; p++)
-	{
-	  cout << demands[i][p] << " ";
-	  if (p==periods-1) cout << endl;
-	}
+    for (p = 0; p < periods; p++)
+    {
+      cout << demands[i][p] << " ";
+      if (p==periods-1) cout << endl;
+    }
   }
+  cout << "accumulated_demands:\n";
+  for (i = 0; i < items; i++)
+  {  
+    for (p = 0; p < periods; p++)
+    {
+      cout << accumulated_demands[i][p] << " ";
+      if (p==periods-1) cout << endl;
+    }
+  }
+  
   cout << "stocking_costs:\n";
   for (i = 0; i < items; i++) cout << stocking_costs[i] << " ";
   cout << endl << "setup_costs:\n";
   for (i1 = 0; i1 < items; i1++)
   {
-	for (i2 = 0; i2 < items; i2++)
-	{
+    for (i2 = 0; i2 < items; i2++)
+    {
       cout << setup_costs[i1][i2] << " ";
       if (i2==items-1) cout << endl;
     }
@@ -151,7 +175,8 @@ ostream& operator<<(ostream& os, const LS_Input& bs)
 }
 
 LS_Output::LS_Output(const LS_Input& i)
-  : in(i) {}
+  : in(i), produced_items(in.Periods(),0)
+{}
 
 LS_Output& LS_Output::operator=(const LS_Output& out)	
 {
@@ -164,7 +189,9 @@ ostream& operator<<(ostream& os, const LS_Output& out)
   unsigned p;
   os << "[";
   for (p = 0; p < out.produced_items.size()-1; p++)
+  {
     os << out.produced_items[p] << ", ";
+  }
   os << out.produced_items[p] << "]";
   return os;
 }

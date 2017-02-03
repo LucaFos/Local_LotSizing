@@ -30,8 +30,8 @@ int main(int argc, const char* argv[])
     Random::Seed(seed);
   
   // cost components: second parameter is the cost, third is the type (true -> hard, false -> soft)
-  LS_CostComponent1 cc1(in, 1, true);
-  LS_CostComponent2 cc2(in, 1, true);
+  SetupCosts cc1(in, 1, true);
+  StockingCosts cc2(in, 1, true);
  
   LS_MoveDeltaCostComponent1 dcc1(in, cc1);
   LS_MoveDeltaCostComponent2 dcc2(in, cc2);
