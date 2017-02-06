@@ -1,6 +1,26 @@
 // File LS_Helpers.cc
 #include "LS_Helpers.hh"
 
+int DueDates::ComputeCost(const LS_State& st) const
+{
+  unsigned violations = 0;
+  unsigned i, p;
+  for(i = 0; i < in.Items(); i++)
+    for(p = 0; p < in.Periods(); p++)
+      if (st.AccumulatedProducedItems(i,p) < in.AccumulatedDemands(i,p) && in.Demands(i,p) != 0)
+        violations++;
+  return violations;
+}
+
+void DueDates::PrintViolations(const LS_State& st, ostream& os) const
+{
+  unsigned i, p;
+  for(i = 0; i < in.Items(); i++)
+    for(p = 0; p < in.Periods(); p++)
+      if (st.AccumulatedProducedItems(i,p) < in.AccumulatedDemands(i,p) && in.Demands(i,p) != 0)
+        os << "Item " << i << "needed on period " << p << "but wasn't produced" << endl;
+}
+
 int SetupCosts::ComputeCost(const LS_State& st) const
 {
   unsigned cost = 0;
@@ -20,16 +40,12 @@ void SetupCosts::PrintViolations(const LS_State& st, ostream& os) const
 }
 
 int StockingCosts::ComputeCost(const LS_State& st) const
-{ 
+{
   unsigned cost = 0;
   unsigned i, p;
   for(i = 0; i < in.Items(); i++)
-  {
     for(p = 0; p < in.Periods(); p++)
-    {
       cost += (st.AccumulatedProducedItems(i,p) - in.AccumulatedDemands(i,p)) * in.StockingCosts(i);
-    }
-  }
   return cost;
 }
  
@@ -52,34 +68,33 @@ LS_StateManager::LS_StateManager(const LS_Input & pin)
 // initial state builder (random permutation)
 void LS_StateManager::RandomState(LS_State& st) 
 {
-  unsigned i, p, periods;
-  vector<unsigned> occurrences;
-  occurrences.resize(in.Items());
-  /*for(i = 0; i < in.Items(); i++)
-    occurrences[i] = in.AccumulatedDemands(i,in.Periods()-1);
+  unsigned i, p, items;
+  vector<unsigned> number_of_items;
+  number_of_items.resize(in.Items(),0);
   
-  i = 0;
-  periods = in.Periods()-1;
+  for(i = 0; i < in.Items(); i++)
+    for(p = 0; p < in.Periods(); p++)
+      if(in.Demands(i,p) != 0)
+        number_of_items[i]++;
+  
   for(p = 0; p < in.Periods(); p++)
   {
-    cout << periods << endl;
-    while (i < in.Items())
+    items = 0;
+    for(i = 0; i < in.Items(); i++)
+      items += number_of_items[i];
+    i = 0;
+    while(i < in.Items())
     {
-      cout << "i: " << i << endl;
-      if (static_cast<unsigned>(Random::Int(0,periods)) < occurrences[i])
+      if(static_cast<unsigned>(Random::Int(1,items)) <= number_of_items[i])
       {
         st.SetItem(i,p);
-        cout << "setting " << i << endl;
-        occurrences[i]--;
-        periods--;
+        number_of_items[i]--;
         break;
       }
+      items -= number_of_items[i];
       i++;
     }
-    i = 0;
   }
-  */
-  cout << st << endl;
 }
 
 bool LS_StateManager::CheckConsistency(const LS_State& st) const
@@ -160,8 +175,16 @@ int LS_MoveDeltaCostComponent1::ComputeDeltaCost(const LS_State& st, const LS_Mo
 	throw logic_error("LS_MoveDeltaCostComponent1::ComputeDeltaCost not implemented yet");	
   return cost;
 }
-          
+
 int LS_MoveDeltaCostComponent2::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
+{
+  int cost = 0;
+  // Insert the code that computes the delta cost of component 1 for move mv in state st
+	throw logic_error("LS_MoveDeltaCostComponent2::ComputeDeltaCost not implemented yet");	
+  return cost;
+}
+
+int LS_MoveDeltaCostComponent3::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
 {
   int cost = 0;
   // Insert the code that computes the delta cost of component 1 for move mv in state st

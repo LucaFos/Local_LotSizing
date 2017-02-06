@@ -11,16 +11,25 @@ using namespace EasyLocal::Core;
  * State Manager 
  ***************************************************************************/
 
-class SetupCosts : public CostComponent<LS_Input,LS_State> 
+class DueDates : public CostComponent<LS_Input,LS_State> 
 {
 public:
-  SetupCosts(const LS_Input & in, int w, bool hard) :    CostComponent<LS_Input,LS_State>(in,w,hard,"LS_CostComponent1") 
+  DueDates(const LS_Input & in, int w, bool hard) :    CostComponent<LS_Input,LS_State>(in,w,hard,"DueDates") 
   {}
   int ComputeCost(const LS_State& st) const;
   void PrintViolations(const LS_State& st, ostream& os = cout) const;
 };
 
-class  StockingCosts: public CostComponent<LS_Input,LS_State> 
+class SetupCosts : public CostComponent<LS_Input,LS_State> 
+{
+public:
+  SetupCosts(const LS_Input & in, int w, bool hard) :    CostComponent<LS_Input,LS_State>(in,w,hard,"SetupCosts") 
+  {}
+  int ComputeCost(const LS_State& st) const;
+  void PrintViolations(const LS_State& st, ostream& os = cout) const;
+};
+
+class StockingCosts: public CostComponent<LS_Input,LS_State> 
 {
 public:
   StockingCosts(const LS_Input & in, int w, bool hard) : CostComponent<LS_Input,LS_State>(in,w,hard,"StockingCosts") 
@@ -46,7 +55,7 @@ class LS_MoveDeltaCostComponent1
   : public DeltaCostComponent<LS_Input,LS_State,LS_Move>
 {
 public:
-  LS_MoveDeltaCostComponent1(const LS_Input & in, SetupCosts& cc) 
+  LS_MoveDeltaCostComponent1(const LS_Input & in, DueDates& cc) 
     : DeltaCostComponent<LS_Input,LS_State,LS_Move>(in,cc,"LS_MoveDeltaCostComponent1") 
   {}
   int ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const;
@@ -56,8 +65,18 @@ class LS_MoveDeltaCostComponent2
   : public DeltaCostComponent<LS_Input,LS_State,LS_Move>
 {
 public:
-  LS_MoveDeltaCostComponent2(const LS_Input & in, StockingCosts& cc) 
+  LS_MoveDeltaCostComponent2(const LS_Input & in, SetupCosts& cc) 
     : DeltaCostComponent<LS_Input,LS_State,LS_Move>(in,cc,"LS_MoveDeltaCostComponent2") 
+  {}
+  int ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const;
+};
+
+class LS_MoveDeltaCostComponent3
+  : public DeltaCostComponent<LS_Input,LS_State,LS_Move>
+{
+public:
+  LS_MoveDeltaCostComponent3(const LS_Input & in, StockingCosts& cc) 
+    : DeltaCostComponent<LS_Input,LS_State,LS_Move>(in,cc,"LS_MoveDeltaCostComponent3") 
   {}
   int ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const;
 };

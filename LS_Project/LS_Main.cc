@@ -30,11 +30,13 @@ int main(int argc, const char* argv[])
     Random::Seed(seed);
   
   // cost components: second parameter is the cost, third is the type (true -> hard, false -> soft)
-  SetupCosts cc1(in, 1, true);
-  StockingCosts cc2(in, 1, true);
+  DueDates cc1(in, 1, true);
+  SetupCosts cc2(in, 1, false);
+  StockingCosts cc3(in, 1, false);
  
   LS_MoveDeltaCostComponent1 dcc1(in, cc1);
   LS_MoveDeltaCostComponent2 dcc2(in, cc2);
+  LS_MoveDeltaCostComponent3 dcc3(in, cc3);
 
   // helpers
   LS_StateManager LS_sm(in);
@@ -45,10 +47,12 @@ int main(int argc, const char* argv[])
   // All cost components must be added to the state manager
   LS_sm.AddCostComponent(cc1);
   LS_sm.AddCostComponent(cc2);
+  LS_sm.AddCostComponent(cc3);
   
   // All delta cost components must be added to the neighborhood explorer
   LS_nhe.AddDeltaCostComponent(dcc1);
   LS_nhe.AddDeltaCostComponent(dcc2);
+  LS_nhe.AddDeltaCostComponent(dcc3);
   
   // runners
   HillClimbing<LS_Input, LS_State, LS_Move> LS_hc(in, LS_sm, LS_nhe, "LS_MoveHillClimbing");
