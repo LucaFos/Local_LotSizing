@@ -83,7 +83,7 @@ void LS_StateManager::RandomState(LS_State& st)
     for(i = 0; i < in.Items(); i++)
       items += number_of_items[i];
     i = 0;
-    while(i < in.Items())
+    while(true)
     {
       if(static_cast<unsigned>(Random::Int(1,items)) <= number_of_items[i])
       {
@@ -99,9 +99,11 @@ void LS_StateManager::RandomState(LS_State& st)
 
 bool LS_StateManager::CheckConsistency(const LS_State& st) const
 {
-  // Insert the code that checks if state in object st is consistent
-  // (for debugging purposes)
-	throw logic_error("LS_StateManager::CheckConsistency not implemented yet");	
+  unsigned p;
+  for(p = 0; p < in.Periods(); p++)
+    if(st[p] < 0 || st[p] >= in.Items())
+      return false;
+  
   return true;
 }
 
@@ -111,8 +113,9 @@ bool LS_StateManager::CheckConsistency(const LS_State& st) const
 
 void LS_OutputManager::InputState(LS_State& st, const LS_Output& out) const 
 {
-  // Insert the code that "translates" an output object to a state object
-	throw logic_error("LS_OutputManager::InputState not implemented yet");	
+  unsigned p;
+  for(p = 0; p < in.Periods(); p++)
+    st.SetItem(out.ProducedItem(p),p);
 }
 
 void LS_OutputManager::OutputState(const LS_State& st, LS_Output& out) const 
@@ -122,8 +125,6 @@ void LS_OutputManager::OutputState(const LS_State& st, LS_Output& out) const
   {
     out.SetItem(st[p],p);
   }
-  // Insert the code that "translates" a state object to an output object
-	//throw logic_error("LS_OutputManager::OutputState not implemented yet");	
 }
 
 

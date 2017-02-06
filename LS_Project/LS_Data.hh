@@ -40,7 +40,7 @@ class LS_Output
 public:
   LS_Output(const LS_Input& i);
   LS_Output& operator=(const LS_Output& out);
-  unsigned ProducedItem(unsigned p) { return produced_items[p]; }
+  unsigned ProducedItem(unsigned p) const { return produced_items[p]; }
   void SetItem(unsigned i, unsigned p) { produced_items[p] = i; }
 
 protected:
