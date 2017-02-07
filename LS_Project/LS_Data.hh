@@ -22,6 +22,8 @@ public:
   unsigned StockingCosts(unsigned i) const { return stocking_costs[i]; }
   unsigned SetupCosts(unsigned i1, unsigned i2) const {return setup_costs[i1][i2]; }
   unsigned AccumulatedDemands(unsigned i, unsigned p) const { return accumulated_demands[i][p]; }
+  //unsigned DemandsPositions(unsigned i, unsigned p) const { return demands_positions[i][p]; }
+  //unsigned DemandsPositionsSize(unsigned i) const { return demands_positions[i].size(); }
   
 protected:
   unsigned periods, items;
@@ -29,7 +31,10 @@ protected:
   vector<vector<unsigned>> demands;
   vector<unsigned> stocking_costs;
   vector<vector<unsigned>> setup_costs;
+  
+  // redundant structures
   vector<vector<unsigned>> accumulated_demands;
+  //vector<vector<unsigned>> demands_positions;
 };
 
 class LS_Output 

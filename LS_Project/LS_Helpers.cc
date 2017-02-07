@@ -7,8 +7,13 @@ int DueDates::ComputeCost(const LS_State& st) const
   unsigned i, p;
   for(i = 0; i < in.Items(); i++)
     for(p = 0; p < in.Periods(); p++)
-      if (st.AccumulatedProducedItems(i,p) < in.AccumulatedDemands(i,p) && in.Demands(i,p) != 0)
-        violations++;
+    //for(p = 0; p < in.DemandsPositionsSize(i); p++)
+      //if (st.AccumulatedProducedItems(i,in.DemandsPositions(i,p)) < in.AccumulatedDemands(i,in.DemandsPositions(i,p)))
+      if (st.DiffItems(i,p) < 0)
+      {
+        violations -= st.DiffItems(i,p);
+      }
+  
   return violations;
 }
 
@@ -17,8 +22,10 @@ void DueDates::PrintViolations(const LS_State& st, ostream& os) const
   unsigned i, p;
   for(i = 0; i < in.Items(); i++)
     for(p = 0; p < in.Periods(); p++)
-      if (st.AccumulatedProducedItems(i,p) < in.AccumulatedDemands(i,p) && in.Demands(i,p) != 0)
-        os << "Item " << i << "needed on period " << p << "but wasn't produced" << endl;
+    //for(p = 0; p < in.DemandsPositionsSize(i); p++)
+      //if (st.AccumulatedProducedItems(i,in.DemandsPositions(i,p)) < in.AccumulatedDemands(i,in.DemandsPositions(i,p)))
+      if (st.DiffItems(i,p) < 0)
+        os << (-st.DiffItems(i,p)) << " item(s) of type " << i << " needed on period " << p << " but weren't produced" << endl;
 }
 
 int SetupCosts::ComputeCost(const LS_State& st) const
@@ -166,7 +173,7 @@ void LS_MoveNeighborhoodExplorer::MakeMove(LS_State& st, const LS_Move& mv) cons
 {
   unsigned i = st[mv.p2];
   st.SetItem(st[mv.p1], mv.p2);
-  st.SetItem(st[i], mv.p1);
+  st.SetItem(i, mv.p1);
 }  
 
 void LS_MoveNeighborhoodExplorer::FirstMove(const LS_State& st, LS_Move& mv) const  throw(EmptyNeighborhood)
@@ -192,27 +199,62 @@ bool LS_MoveNeighborhoodExplorer::NextMove(const LS_State& st, LS_Move& mv) cons
     return false;
 }
 
-int LS_MoveDeltaCostComponent1::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
+int LS_MoveDeltaCostDueDates::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
+{
+  int violations = 0;
+  unsigned p;
+  //for(p = mv.p1; p < in.Periods(); p++)
+  for(p = mv.p1; p < mv.p2; p++)
+  {
+    if(st.DiffItems(st[mv.p2],p) < 0){
+      cout << "1-- (" << st[mv.p2] << "," << p << ")\n";
+      violations--;
+    }
+    /*if(st.DiffItems(st[mv.p1],p) <= 0){
+      cout << "1++ (" << st[mv.p1] << "," << p << ")\n";
+      violations++;
+    }*/
+  }
+  //for(p = mv.p2; p < in.Periods(); p++)
+  for(p = mv.p2; p > mv.p1; p--)
+  {    
+    if(st.DiffItems(st[mv.p1],p) < 0){
+      cout << "2-- (" << st[mv.p1] << "," << p << ")\n";
+      violations--;
+    }
+    /*if(st.DiffItems(st[mv.p2],p) <= 0){
+      cout << "2++ (" << st[mv.p2] << "," << p << ")\n";
+      violations++;
+    }*/
+  }
+  
+  cout << "diff_items:\n";
+  unsigned i;
+  for(i = 0; i < in.Items(); i++)
+  {
+    for(p = 0; p < in.Periods(); p++)
+    {
+      cout << st.DiffItems(i,p) << " ";
+      if(p == in.Periods()-1) cout << endl;
+    }
+  }
+  
+  return violations;
+}
+
+int LS_MoveDeltaCostSetupCosts::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
 {
   int cost = 0;
   // Insert the code that computes the delta cost of component 1 for move mv in state st
-	throw logic_error("LS_MoveDeltaCostComponent1::ComputeDeltaCost not implemented yet");	
+	//throw logic_error("LS_MoveDeltaCostComponent2::ComputeDeltaCost not implemented yet");	
   return cost;
 }
 
-int LS_MoveDeltaCostComponent2::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
+int LS_MoveDeltaCostStockingCosts::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
 {
   int cost = 0;
   // Insert the code that computes the delta cost of component 1 for move mv in state st
-	throw logic_error("LS_MoveDeltaCostComponent2::ComputeDeltaCost not implemented yet");	
-  return cost;
-}
-
-int LS_MoveDeltaCostComponent3::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
-{
-  int cost = 0;
-  // Insert the code that computes the delta cost of component 1 for move mv in state st
-	throw logic_error("LS_MoveDeltaCostComponent2::ComputeDeltaCost not implemented yet");	
+	//throw logic_error("LS_MoveDeltaCostComponent2::ComputeDeltaCost not implemented yet");	
   return cost;
 }
 

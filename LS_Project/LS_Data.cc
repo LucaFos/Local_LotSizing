@@ -9,7 +9,7 @@ LS_Input::LS_Input(string file_name)
   ifstream is(file_name.c_str());
   assert(!is.fail());
   
-  unsigned i, p, i1, i2;
+  unsigned i, p, i1, i2, item;
   string s;
   is >> s >> s >> s;
   periods = stoi(s.substr(0,s.length()));
@@ -18,6 +18,7 @@ LS_Input::LS_Input(string file_name)
   
   demands.resize(items, vector<unsigned>(periods,false));
   accumulated_demands.resize(items, vector<unsigned>(periods,false));
+  //demands_positions.resize(items, vector<unsigned>(0,0));
   is >> s >> s;
   for (i = 0; i < items; i++)
   {
@@ -27,18 +28,27 @@ LS_Input::LS_Input(string file_name)
       
       if (i==0 && p==0)
       {
-        demands[0][0] = stoi(s.substr(2,2));
-        accumulated_demands[0][0] = stoi(s.substr(2,2));
+        item = stoi(s.substr(2,2));
+        demands[0][0] = item;
+        accumulated_demands[0][0] = item;
+        //if(item != 0)
+          //demands_positions[i].push_back(p);
       }
       else if (p==0)
       {
-        demands[i][0] = stoi(s.substr(1,1));
-        accumulated_demands[i][0] = stoi(s.substr(1,1));
+        item = stoi(s.substr(1,1));
+        demands[i][0] = item;
+        accumulated_demands[i][0] = item;
+        //if(item != 0)
+          //demands_positions[i].push_back(p);
       }
       else
       {
-        demands[i][p] = stoi(s.substr(0,1));
-        accumulated_demands[i][p] = accumulated_demands[i][p-1] + stoi(s.substr(0,1));
+        item = stoi(s.substr(0,1));
+        demands[i][p] = item;
+        accumulated_demands[i][p] = accumulated_demands[i][p-1] + item;
+        //if(item != 0)
+          //demands_positions[i].push_back(p);
       }
     }
   }
@@ -89,6 +99,16 @@ LS_Input::LS_Input(string file_name)
     {
       cout << accumulated_demands[i][p] << " ";
       if (p==periods-1) cout << endl;
+    }
+  }
+  
+  cout << "demands_positions:\n";
+  for(i = 0; i < items; i++)
+  {
+    for(p = 0; p < demands_positions[i].size(); p++)
+    {
+      cout << demands_positions[i][p] << " ";
+      if (p==demands_positions[i].size()-1) cout << endl;
     }
   }
   

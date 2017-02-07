@@ -51,31 +51,31 @@ protected:
  * LS_Move Neighborhood Explorer:
  ***************************************************************************/
 
-class LS_MoveDeltaCostComponent1
+class LS_MoveDeltaCostDueDates
   : public DeltaCostComponent<LS_Input,LS_State,LS_Move>
 {
 public:
-  LS_MoveDeltaCostComponent1(const LS_Input & in, DueDates& cc) 
+  LS_MoveDeltaCostDueDates(const LS_Input & in, DueDates& cc) 
     : DeltaCostComponent<LS_Input,LS_State,LS_Move>(in,cc,"LS_MoveDeltaCostComponent1") 
   {}
   int ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const;
 };
 
-class LS_MoveDeltaCostComponent2
+class LS_MoveDeltaCostSetupCosts
   : public DeltaCostComponent<LS_Input,LS_State,LS_Move>
 {
 public:
-  LS_MoveDeltaCostComponent2(const LS_Input & in, SetupCosts& cc) 
+  LS_MoveDeltaCostSetupCosts(const LS_Input & in, SetupCosts& cc) 
     : DeltaCostComponent<LS_Input,LS_State,LS_Move>(in,cc,"LS_MoveDeltaCostComponent2") 
   {}
   int ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const;
 };
 
-class LS_MoveDeltaCostComponent3
+class LS_MoveDeltaCostStockingCosts
   : public DeltaCostComponent<LS_Input,LS_State,LS_Move>
 {
 public:
-  LS_MoveDeltaCostComponent3(const LS_Input & in, StockingCosts& cc) 
+  LS_MoveDeltaCostStockingCosts(const LS_Input & in, StockingCosts& cc) 
     : DeltaCostComponent<LS_Input,LS_State,LS_Move>(in,cc,"LS_MoveDeltaCostComponent3") 
   {}
   int ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const;

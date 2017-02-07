@@ -14,12 +14,15 @@ public:
   unsigned operator[](unsigned i) const { return produced_items[i]; }
   unsigned& operator[](unsigned i) { return produced_items[i]; }
   unsigned AccumulatedProducedItems(unsigned i, unsigned p) const { return accumulated_produced_items[i][p]; }
+  int DiffItems(unsigned i, unsigned p) const { return diff_items[i][p]; }
   void SetItem(unsigned i, unsigned p);
   
 protected:
   const LS_Input & in;
   vector<unsigned> produced_items;
   vector<vector<unsigned>> accumulated_produced_items;
+  vector<vector<int>> diff_items;                           // diff_items = (accumulated_produced_items - accumulated_demands)
+                                                            // diff_items[i][p] < 0 <-> violation
 };
 
 class LS_Move

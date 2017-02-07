@@ -34,9 +34,9 @@ int main(int argc, const char* argv[])
   SetupCosts cc2(in, 1, false);
   StockingCosts cc3(in, 1, false);
  
-  LS_MoveDeltaCostComponent1 dcc1(in, cc1);
-  LS_MoveDeltaCostComponent2 dcc2(in, cc2);
-  LS_MoveDeltaCostComponent3 dcc3(in, cc3);
+  LS_MoveDeltaCostDueDates dcc1(in, cc1);
+  LS_MoveDeltaCostSetupCosts dcc2(in, cc2);
+  LS_MoveDeltaCostStockingCosts dcc3(in, cc3);
 
   // helpers
   LS_StateManager LS_sm(in);
