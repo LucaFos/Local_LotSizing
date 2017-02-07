@@ -135,38 +135,61 @@ void LS_OutputManager::OutputState(const LS_State& st, LS_Output& out) const
 // initial move builder
 void LS_MoveNeighborhoodExplorer::RandomMove(const LS_State& st, LS_Move& mv) const  throw(EmptyNeighborhood)
 {
-  // insert the code that writes a random move on mv in state st
-	throw logic_error("LS_MoveNeighborhoodExplorer::RandomMove not implemented yet");	
-} 
+  unsigned n1 = ((in.Periods()-1) * in.Periods())/2;
+  unsigned n2 = in.Periods()-1;
+  unsigned p = 0;
+  while(true)
+  {
+    if(static_cast<unsigned>(Random::Int(1,n1)) <= n2)
+    {
+      mv.p1 = p;
+      mv.p2 = Random::Int(p+1,in.Periods()-1);
+      break;
+    }
+    else
+    {
+      n1 -= n2;
+      n2--;
+      p++;
+    }
+  }
+}
 
 // check move feasibility
 bool LS_MoveNeighborhoodExplorer::FeasibleMove(const LS_State& st, const LS_Move& mv) const
 {
-  // Insert the code that check is move mv is legal in state st 
-  // (return true if legal, false otherwise)
-	throw logic_error("LS_MoveNeighborhoodExplorer::FeasibleMove not implemented yet");	
-  return true;
+  return mv.p1 < mv.p2;
 } 
 
 // update the state according to the move 
 void LS_MoveNeighborhoodExplorer::MakeMove(LS_State& st, const LS_Move& mv) const
 {
-  // Insert the code that modify the state st based on the application of move mv
-	throw logic_error("LS_MoveNeighborhoodExplorer::MakeMove not implemented yet");	
+  unsigned i = st[mv.p2];
+  st.SetItem(st[mv.p1], mv.p2);
+  st.SetItem(st[i], mv.p1);
 }  
 
 void LS_MoveNeighborhoodExplorer::FirstMove(const LS_State& st, LS_Move& mv) const  throw(EmptyNeighborhood)
 {
-  // Insert the code the generate the first move in the neighborhood and store it in mv
-	throw logic_error("LS_MoveNeighborhoodExplorer::FirstMove not implemented yet");	
+  mv.p1 = 0;
+  mv.p2 = 1;
 }
 
 bool LS_MoveNeighborhoodExplorer::NextMove(const LS_State& st, LS_Move& mv) const
 {
-  // Insert the code that generate the move that follows mv in the neighborhood, and writes
-  // it back in mv. Return false if mv is already the last move. 
-	throw logic_error("LS_MoveNeighborhoodExplorer::NextMove not implemented yet");	
-  return true;
+  if (mv.p2 < in.Periods() - 1) 
+  {
+    mv.p2++;
+    return true;
+  }
+  else if (mv.p1 < in.Periods() - 2)
+  { 
+    mv.p1++; 
+    mv.p2 = mv.p1 + 1; 
+    return true;
+  }
+  else
+    return false;
 }
 
 int LS_MoveDeltaCostComponent1::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
