@@ -6,6 +6,11 @@ array[1..Items,1..Items] of int: SetupCosts;
 array[1..Periods*Items] of var 0..1: X;        % Output matrix
 array[1..Periods] of var 0..Items-1: Sol;      % Output array
 
+array[1..Periods] of int: SolMia = [1, 1, 0, 0, 3, 2, 2, 2, 0, 0, 3, 3, 3, 1, 0, 0, 0, 2, 3, 2];
+
+constraint
+      forall (p in 1..Periods)
+              (Sol[p] == SolMia[p]);
 
 constraint
       forall (t in 1..Periods)

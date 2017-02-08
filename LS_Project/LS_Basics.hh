@@ -16,6 +16,7 @@ public:
   unsigned AccumulatedProducedItems(unsigned i, unsigned p) const { return accumulated_produced_items[i][p]; }
   int DiffItems(unsigned i, unsigned p) const { return diff_items[i][p]; }
   void SetItem(unsigned i, unsigned p);
+  void RemoveItem(unsigned p);
   
 protected:
   const LS_Input & in;

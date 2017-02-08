@@ -92,6 +92,7 @@ LS_Input::LS_Input(string file_name)
       if (p==periods-1) cout << endl;
     }
   }
+  
   cout << "accumulated_demands:\n";
   for (i = 0; i < items; i++)
   {  
