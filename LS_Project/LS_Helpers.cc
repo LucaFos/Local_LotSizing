@@ -7,8 +7,6 @@ int DueDates::ComputeCost(const LS_State& st) const
   unsigned i, p;
   for(i = 0; i < in.Items(); i++)
     for(p = 0; p < in.Periods(); p++)
-    //for(p = 0; p < in.DemandsPositionsSize(i); p++)
-      //if (st.AccumulatedProducedItems(i,in.DemandsPositions(i,p)) < in.AccumulatedDemands(i,in.DemandsPositions(i,p)))
       if (st.DiffItems(i,p) < 0)
       {
         violations -= st.DiffItems(i,p);
@@ -22,8 +20,6 @@ void DueDates::PrintViolations(const LS_State& st, ostream& os) const
   unsigned i, p;
   for(i = 0; i < in.Items(); i++)
     for(p = 0; p < in.Periods(); p++)
-    //for(p = 0; p < in.DemandsPositionsSize(i); p++)
-      //if (st.AccumulatedProducedItems(i,in.DemandsPositions(i,p)) < in.AccumulatedDemands(i,in.DemandsPositions(i,p)))
       if (st.DiffItems(i,p) < 0)
         os << (-st.DiffItems(i,p)) << " item(s) of type " << i << " needed on period " << p << " but weren't produced" << endl;
 }
@@ -52,7 +48,8 @@ int StockingCosts::ComputeCost(const LS_State& st) const
   unsigned i, p;
   for(i = 0; i < in.Items(); i++)
     for(p = 0; p < in.Periods(); p++)
-      cost += (st.AccumulatedProducedItems(i,p) - in.AccumulatedDemands(i,p)) * in.StockingCosts(i);
+      if(st.DiffItems(i,p) > 0)
+        cost += st.DiffItems(i,p) * in.StockingCosts(i);
   return cost;
 }
  
@@ -177,28 +174,6 @@ void LS_MoveNeighborhoodExplorer::MakeMove(LS_State& st, const LS_Move& mv) cons
   st.RemoveItem(mv.p2);
   st.SetItem(i1, mv.p2);
   st.SetItem(i2, mv.p1);
-  
-  /*
-  unsigned i, p;
-  cout << "acc_prod_items:\n";
-  for(i = 0; i < in.Items(); i++)
-  {
-    for(p = 0; p < in.Periods(); p++)
-    {
-      cout << st.AccumulatedProducedItems(i,p) << " ";
-      if(p == in.Periods()-1) cout << endl;
-    }
-  }
-  cout << "diff_items:\n";
-  for(i = 0; i < in.Items(); i++)
-  {
-    for(p = 0; p < in.Periods(); p++)
-    {
-      cout << st.DiffItems(i,p) << " ";
-      if(p == in.Periods()-1) cout << endl;
-    }
-  }
-  cout << endl;*/
 }
 
 void LS_MoveNeighborhoodExplorer::FirstMove(const LS_State& st, LS_Move& mv) const  throw(EmptyNeighborhood)
@@ -226,35 +201,24 @@ bool LS_MoveNeighborhoodExplorer::NextMove(const LS_State& st, LS_Move& mv) cons
 
 int LS_MoveDeltaCostDueDates::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
 {
+  if(st[mv.p1] == st[mv.p2]) return 0;
   int violations = 0;
   unsigned p;
   for(p = mv.p1; p < mv.p2; p++)
   {
     if(st.DiffItems(st[mv.p2],p) < 0){
-      //cout << "1-- (" << st[mv.p2] << "," << p << ")\n";
       violations--;
     }
     if(st.DiffItems(st[mv.p1],p) <= 0){
-      //cout << "1++ (" << st[mv.p1] << "," << p << ")\n";
       violations++;
     }
   }
-  /*for(p = mv.p2; p > mv.p1; p--)
-  {    
-    if(st.DiffItems(st[mv.p1],p) <= 0){
-      cout << "2++ (" << st[mv.p1] << "," << p << ")\n";
-      violations++;
-    }
-    if(st.DiffItems(st[mv.p2],p) < 0){
-      cout << "2-- (" << st[mv.p2] << "," << p << ")\n";
-      violations--;
-    }
-  }*/
   return violations;
 }
 
 int LS_MoveDeltaCostSetupCosts::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
 {
+  if(st[mv.p1] == st[mv.p2]) return 0;
   int cost = 0;
   unsigned p1 = mv.p1;
   unsigned p2 = mv.p2;
@@ -270,52 +234,39 @@ int LS_MoveDeltaCostSetupCosts::ComputeDeltaCost(const LS_State& st, const LS_Mo
       cost += in.SetupCosts(st[p2],st[p1]);
     }
   }
-  //cout << "cost: " << cost << endl;
   
   if(p1 != 0)
   {
     cost += in.SetupCosts(st[p1-1],st[p2]);
     cost -= in.SetupCosts(st[p1-1],st[p1]);
   }
-  //cout << "cost: " << cost << endl;
   
   if(p2 != in.Periods()-1)
   {
     cost += in.SetupCosts(st[p1],st[p2+1]);
     cost -= in.SetupCosts(st[p2],st[p2+1]);
   }
-  //cout << "cost: " << cost << endl;
   
   cost += in.SetupCosts(st[p2-1],st[p1]);
   cost -= in.SetupCosts(st[p2-1],st[p2]);
-  //cout << "cost: " << cost << endl;
   
   return cost;
 }
 
 int LS_MoveDeltaCostStockingCosts::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
 {
-  unsigned p;
+  if(st[mv.p1] == st[mv.p2]) return 0;
   int cost = 0;
-  //unsigned l = mv.p2 - mv.p1;
-  unsigned c1 = 0;
-  unsigned c2 = 0;
+  unsigned p;
   for(p = mv.p1; p < mv.p2; p++)
   {
-    if(st.DiffItems(st[mv.p2],p) >= 0)
-      c1++;
-    if(st.DiffItems(st[mv.p1],p) > 0)
-      c2++;
+    if(st.DiffItems(st[mv.p2],p) >= 0){
+      cost += in.StockingCosts(st[mv.p2]);
+    }
+    if(st.DiffItems(st[mv.p1],p) > 0){
+      cost -= in.StockingCosts(st[mv.p1]);
+    }
   }
-  cost -= c1 * in.StockingCosts(st[mv.p2]);
-  cost += c2 * in.StockingCosts(st[mv.p1]);
-  
-  //cost -= l * in.StockingCosts(st[mv.p1]);
-  //cost += l * in.StockingCosts(st[mv.p2]);
-  /*for(p = mv.p1; p < mv.p2; p++)
-  {
-    cost += in.StockingCosts(p);
-  }*/
   
   return cost;
 }

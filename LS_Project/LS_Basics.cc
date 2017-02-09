@@ -21,6 +21,8 @@ LS_State::LS_State(const LS_Input &i)
 LS_State& LS_State::operator=(const LS_State& st)
 {
   produced_items = st.produced_items;
+  accumulated_produced_items = st.accumulated_produced_items;
+  diff_items = st.diff_items;
   return *this;
 }
 
@@ -46,42 +48,13 @@ ostream& operator<<(ostream& os, const LS_State& st)
 void LS_State::SetItem(unsigned i, unsigned p)
 {
   unsigned p1;
-  /*if(produced_items[p] != -1)
-  {
-    accumulated_produced_items[produced_items[p]][p]--;
-  }*/
-  
   for(p1 = p; p1 < in.Periods(); p1++)
   {
     accumulated_produced_items[i][p1]++;
     diff_items[i][p1]++;
-    /*if(produced_items[p] != -1){
-      diff_items[produced_items[p]][p1]--;
-      cout << produced_items[p] << endl;
-    }*/
   }
   
   produced_items[p] = i;
-  
-  /*
-  cout << "acc_prod_items:\n";
-  for(i = 0; i < in.Items(); i++)
-  {
-    for(p = 0; p < in.Periods(); p++)
-    {
-      cout << accumulated_produced_items[i][p] << " ";
-      if(p == in.Periods()-1) cout << endl;
-    }
-  }*//*
-  cout << "diff_items:\n";
-  for(i = 0; i < in.Items(); i++)
-  {
-    for(p = 0; p < in.Periods(); p++)
-    {
-      cout << diff_items[i][p] << " ";
-      if(p == in.Periods()-1) cout << endl;
-    }
-  }*/
 }
 
 void LS_State::RemoveItem(unsigned p)
@@ -91,19 +64,7 @@ void LS_State::RemoveItem(unsigned p)
   {
     accumulated_produced_items[produced_items[p]][p1]--;
     diff_items[produced_items[p]][p1]--;
-    //cout << "diff_items[" << produced_items[p] << "][" << p1 << "] --\n";
-    //cout << "prodItems[" << p << "]: " << produced_items[p] << endl;
   }
-  /*
-  cout << "diff_items:\n";
-  for(unsigned i = 0; i < in.Items(); i++)
-  {
-    for(p = 0; p < in.Periods(); p++)
-    {
-      cout << diff_items[i][p] << " ";
-      if(p == in.Periods()-1) cout << endl;
-    }
-  }*/
 }
 
 LS_Move::LS_Move(unsigned pos1, unsigned pos2)

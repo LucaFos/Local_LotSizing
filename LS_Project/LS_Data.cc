@@ -18,7 +18,6 @@ LS_Input::LS_Input(string file_name)
   
   demands.resize(items, vector<unsigned>(periods,false));
   accumulated_demands.resize(items, vector<unsigned>(periods,false));
-  //demands_positions.resize(items, vector<unsigned>(0,0));
   is >> s >> s;
   for (i = 0; i < items; i++)
   {
@@ -31,24 +30,18 @@ LS_Input::LS_Input(string file_name)
         item = stoi(s.substr(2,2));
         demands[0][0] = item;
         accumulated_demands[0][0] = item;
-        //if(item != 0)
-          //demands_positions[i].push_back(p);
       }
       else if (p==0)
       {
         item = stoi(s.substr(1,1));
         demands[i][0] = item;
         accumulated_demands[i][0] = item;
-        //if(item != 0)
-          //demands_positions[i].push_back(p);
       }
       else
       {
         item = stoi(s.substr(0,1));
         demands[i][p] = item;
         accumulated_demands[i][p] = accumulated_demands[i][p-1] + item;
-        //if(item != 0)
-          //demands_positions[i].push_back(p);
       }
     }
   }
