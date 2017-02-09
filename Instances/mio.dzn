@@ -1,7 +1,7 @@
-Periods = 3; 
+Periods = 8; 
 Items = 2; 
-Demands = [|0, 1, 0 
-           |1, 0, 1|]; 
+Demands = [|0, 1, 0, 0, 0, 0, 0, 0 
+           |1, 0, 1, 1, 1, 1, 1, 1|]; 
 StockingCosts = [10, 15]; 
 SetupCosts = [|0, 131 
               |193, 0|];

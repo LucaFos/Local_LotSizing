@@ -139,23 +139,27 @@ void LS_OutputManager::OutputState(const LS_State& st, LS_Output& out) const
 // initial move builder
 void LS_MoveNeighborhoodExplorer::RandomMove(const LS_State& st, LS_Move& mv) const  throw(EmptyNeighborhood)
 {
-  unsigned n1 = ((in.Periods()-1) * in.Periods())/2;
-  unsigned n2 = in.Periods()-1;
-  unsigned p = 0;
+  unsigned p;
+  vector<unsigned> unequal_items;
   while(true)
   {
-    if(static_cast<unsigned>(Random::Int(1,n1)) <= n2)
+    mv.p1 = Random::Int(0,in.Periods()-1);
+    for(p = 0; p < in.Periods(); p++)
     {
-      mv.p1 = p;
-      mv.p2 = Random::Int(p+1,in.Periods()-1);
-      break;
+      if(st[mv.p1] != st[p])
+      {
+        unequal_items.push_back(p);
+      }
     }
-    else
+    
+    mv.p2 = unequal_items[Random::Int(0,unequal_items.size()-1)];
+    if(mv.p1 > mv.p2)
     {
-      n1 -= n2;
-      n2--;
-      p++;
+      p = mv.p1;
+      mv.p1 = mv.p2;
+      mv.p2 = p;
     }
+    return;
   }
 }
 
@@ -180,10 +184,38 @@ void LS_MoveNeighborhoodExplorer::FirstMove(const LS_State& st, LS_Move& mv) con
 {
   mv.p1 = 0;
   mv.p2 = 1;
+  while(st[mv.p2] == st[mv.p1])
+    mv.p2++;
 }
 
 bool LS_MoveNeighborhoodExplorer::NextMove(const LS_State& st, LS_Move& mv) const
 {
+  if (mv.p2 == in.Periods()-1)
+  {
+    mv.p1++;
+    mv.p2 = mv.p1+1;
+  }
+  else
+  {
+    mv.p2++;
+  }
+  while(mv.p1 < in.Periods()-1)
+  {
+    while(st[mv.p1] == st[mv.p2] && mv.p2 < in.Periods()-1)
+      mv.p2++;
+    if(st[mv.p1] != st[mv.p2])
+      return true;
+    
+    mv.p1++;
+    mv.p2 = mv.p1+1;
+  }
+  
+  return false;
+  
+  
+  
+  
+  /*
   if (mv.p2 < in.Periods() - 1) 
   {
     mv.p2++;
@@ -196,7 +228,7 @@ bool LS_MoveNeighborhoodExplorer::NextMove(const LS_State& st, LS_Move& mv) cons
     return true;
   }
   else
-    return false;
+    return false;*/
 }
 
 int LS_MoveDeltaCostDueDates::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
@@ -222,17 +254,15 @@ int LS_MoveDeltaCostSetupCosts::ComputeDeltaCost(const LS_State& st, const LS_Mo
   int cost = 0;
   unsigned p1 = mv.p1;
   unsigned p2 = mv.p2;
-  if(p1 != in.Periods()-1)
+  
+  if(p1+1 != p2)
   {
-    if(p1+1 != p2)
-    {
-      cost += in.SetupCosts(st[p2],st[p1+1]);
-      cost -= in.SetupCosts(st[p1],st[p1+1]);
-    }
-    else
-    {
-      cost += in.SetupCosts(st[p2],st[p1]);
-    }
+    cost += in.SetupCosts(st[p2],st[p1+1]);
+    cost -= in.SetupCosts(st[p1],st[p1+1]);
+  }
+  else
+  {
+    cost += in.SetupCosts(st[p2],st[p1]);
   }
   
   if(p1 != 0)
