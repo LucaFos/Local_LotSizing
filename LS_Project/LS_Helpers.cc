@@ -126,9 +126,7 @@ void LS_OutputManager::OutputState(const LS_State& st, LS_Output& out) const
 {
   unsigned p;
   for(p = 0; p < in.Periods(); p++)
-  {
     out.SetItem(st[p],p);
-  }
 }
 
 
@@ -144,6 +142,9 @@ void LS_MoveNeighborhoodExplorer::RandomMove(const LS_State& st, LS_Move& mv) co
   while(true)
   {
     mv.p1 = Random::Int(0,in.Periods()-1);
+    
+    // This for cycle fills unequal_items with the positions in which the produced item
+    // is different than the one produced in p1
     for(p = 0; p < in.Periods(); p++)
     {
       if(st[mv.p1] != st[p])
@@ -180,6 +181,7 @@ void LS_MoveNeighborhoodExplorer::MakeMove(LS_State& st, const LS_Move& mv) cons
   st.SetItem(i2, mv.p1);
 }
 
+// Automatically avoids null moves
 void LS_MoveNeighborhoodExplorer::FirstMove(const LS_State& st, LS_Move& mv) const  throw(EmptyNeighborhood)
 {
   mv.p1 = 0;
@@ -188,6 +190,7 @@ void LS_MoveNeighborhoodExplorer::FirstMove(const LS_State& st, LS_Move& mv) con
     mv.p2++;
 }
 
+// Generate next move avoiding null moves
 bool LS_MoveNeighborhoodExplorer::NextMove(const LS_State& st, LS_Move& mv) const
 {
   if (mv.p2 == in.Periods()-1)
@@ -217,6 +220,8 @@ int LS_MoveDeltaCostDueDates::ComputeDeltaCost(const LS_State& st, const LS_Move
 {
   int violations = 0;
   unsigned p;
+  
+  // It checks the rows corresponding to st[mv.p1] and st[mv.p2] between p1 and p2-1
   for(p = mv.p1; p < mv.p2; p++)
   {
     if(st.DiffItems(st[mv.p2],p) < 0){
@@ -229,6 +234,7 @@ int LS_MoveDeltaCostDueDates::ComputeDeltaCost(const LS_State& st, const LS_Move
   return violations;
 }
 
+// It is sufficient to check on the preceding and the succeeding of p1 and p2
 int LS_MoveDeltaCostSetupCosts::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
 {
   int cost = 0;
@@ -267,6 +273,8 @@ int LS_MoveDeltaCostStockingCosts::ComputeDeltaCost(const LS_State& st, const LS
 {
   int cost = 0;
   unsigned p;
+  
+  // It checks the rows corresponding to st[mv.p1] and st[mv.p2] between p1 and p2-1 
   for(p = mv.p1; p < mv.p2; p++)
   {
     if(st.DiffItems(st[mv.p2],p) >= 0){
