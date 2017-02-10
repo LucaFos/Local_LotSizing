@@ -211,29 +211,10 @@ bool LS_MoveNeighborhoodExplorer::NextMove(const LS_State& st, LS_Move& mv) cons
   }
   
   return false;
-  
-  
-  
-  
-  /*
-  if (mv.p2 < in.Periods() - 1) 
-  {
-    mv.p2++;
-    return true;
-  }
-  else if (mv.p1 < in.Periods() - 2)
-  { 
-    mv.p1++; 
-    mv.p2 = mv.p1 + 1; 
-    return true;
-  }
-  else
-    return false;*/
 }
 
 int LS_MoveDeltaCostDueDates::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
 {
-  if(st[mv.p1] == st[mv.p2]) return 0;
   int violations = 0;
   unsigned p;
   for(p = mv.p1; p < mv.p2; p++)
@@ -250,7 +231,6 @@ int LS_MoveDeltaCostDueDates::ComputeDeltaCost(const LS_State& st, const LS_Move
 
 int LS_MoveDeltaCostSetupCosts::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
 {
-  if(st[mv.p1] == st[mv.p2]) return 0;
   int cost = 0;
   unsigned p1 = mv.p1;
   unsigned p2 = mv.p2;
@@ -285,7 +265,6 @@ int LS_MoveDeltaCostSetupCosts::ComputeDeltaCost(const LS_State& st, const LS_Mo
 
 int LS_MoveDeltaCostStockingCosts::ComputeDeltaCost(const LS_State& st, const LS_Move& mv) const
 {
-  if(st[mv.p1] == st[mv.p2]) return 0;
   int cost = 0;
   unsigned p;
   for(p = mv.p1; p < mv.p2; p++)
