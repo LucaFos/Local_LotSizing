@@ -21,6 +21,8 @@ public:
 protected:
   const LS_Input & in;
   vector<unsigned> produced_items;
+  
+  // Redundant structures
   vector<vector<unsigned>> accumulated_produced_items;
   vector<vector<int>> diff_items;                           // diff_items = (accumulated_produced_items - accumulated_demands)
                                                             // diff_items[i][p] < 0 <-> violation
