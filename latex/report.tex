@@ -1,0 +1,22 @@
+\documentclass[12pt]{article}
+\usepackage[utf8x]{inputenc}
+\begin{document}
+\section*{Problema del Lot-Sizing: specifica}
+Il problema che è stato analizzato viene chiamato Lot-Sizing. Si tratta di un problema di scheduling a una macchina.\\
+I seguenti dati vengono forniti per ogni istanza:
+\begin{itemize}
+\item Un insieme $I=\{0,\dots,m-1\}$ che rappresenta i tipi di oggetto che possono essere prodotti.
+\item Un insieme $P=\{0,\dots,p-1\}$ che rappresenta i periodi temporali (discreti) durante i quali produciamo un oggetto.
+\item Una matrice $I\times P$ (la chiamo $D$) tale che $d^i_t=1$ se un oggetto di tipo $i$ è richiesto al tempo $p$, $d^i_t=0$ altrimenti.
+\item Una matrice $I\times I$ (la chiamo $C$) tale che $c^{ij}$ rappresenta il costo che va pagato quando la macchina passa dalla produzione di un oggetto di tipo $i$ ad uno di tipo $j$ ($\forall i,c^{ii}=0$).
+\item Un array $H$ di lunghezza $m$ tale che $h^i$ rappresenta il costo dato dal tenere in magazzino un oggetto di tipo $i$ per un periodo (una unità temporale).
+\end{itemize}
+Assumendo di dover produrre esattamente un oggetto per ogni periodo, il problema consiste nel determinare quale oggetto vada prodotto dalla macchina in ogni periodo di tempo. La soluzione quindi può essere rappresentata tramite un array $V$ di lunghezza $p$, ogni $V^t$ rappresenterà il tipo di oggetto da produrre al tempo $t$.\\\\
+Si ha un unico constraint di tipo hard che possiamo chiamare \textbf{NoBacklog}: ogni oggetto richiesto deve essere prodotto non più tardi rispetto alla data di richiesta. Cioè, per ogni oggetto $i$ e ogni periodo $t$, il numero di oggetti $i$ prodotti fino al tempo $t$ deve essere maggiore o uguale al numero totale di richieste di $i$ fino al tempo $t$.\\\\
+La funzione obiettivo da minimizzare è costituita da due elementi:
+\begin{itemize}
+\item \textbf{StockingCost}: è la somma dei costi di stoccaggio di tutti gli oggetti. Questi costi vengono generati quando la macchina produce un oggetto al tempo $t$ ma l'oggetto è richiesto solamente ad un tempo $t'>t$.
+\item \textbf{SetupCost}: è la somma dei costi di setup della macchina ogni volta che questa passa da produrre un tipo di oggetto ad uno diverso. Il primo oggetto prodotto genera un SetupCost nullo.
+\end{itemize}
+
+\end{document}
