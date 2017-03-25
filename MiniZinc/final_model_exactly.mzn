@@ -35,15 +35,15 @@ constraint
 solve:: int_search([SolMatrix[i,j] | i in 1..Items, j in 1..Periods], occurrence, indomain_min, complete)
        minimize (
           sum (i in 1..Items) (StockingCosts[i] * sum(t in 1..Periods, j in 1..t)(SolMatrix[i,j]-Demands[i,j]))
-          +
-          sum (i in 1..Periods-1) (SetupCosts[Sol[i]+1,Sol[i+1]+1])
+          %+
+          %sum (i in 1..Periods-1) (SetupCosts[Sol[i]+1,Sol[i+1]+1])
          );
 
 
 output ["Cost: "++show (
           sum (i in 1..Items) (StockingCosts[i] * sum(t in 1..Periods, j in 1..t)(SolMatrix[i,j]-Demands[i,j]))
-          +
-          sum (i in 1..Periods-1) (SetupCosts[Sol[i]+1,Sol[i+1]+1])
+          %+
+          %sum (i in 1..Periods-1) (SetupCosts[Sol[i]+1,Sol[i+1]+1])
           )++" "]
        ++
        [show(Sol)]
