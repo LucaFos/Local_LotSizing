@@ -13,13 +13,17 @@
 
 items (1..2).
 periods (1..3).
+demand (1,1).
+demand (2,2).
+%demand (1,3).
 
 stocking_cost (1,13).
-stocking_cost (2,13).
+stocking_cost (2,14).
 
 setup_cost (X,X,0) :- items(X).
 setup_cost (1,2,168).
 setup_cost (2,1,146).
+
 
 1 { assign(P,I) : items(I) } 1 :- periods(P).
 
@@ -30,17 +34,17 @@ sum_dem(I,P,N) :- N = #count{ P1 : demand(I,P1), periods(P1), P1<=P }, items(I),
 :- sum_dem(I,P,N1), sum_prod(I,P,N2), N1>N2, items(I), periods(P).
 
 
-stock (N,P,I) :- N = #sum{ M : sum_dem(I,P,N1), sum_prod(I,P,N2), M=(N2) },
+stock (I,P,N) :- N = #sum{ M : sum_dem(I,P,N1), sum_prod(I,P,N2), stocking_cost(I,C),
+                          M=C*(N2-N1) },
                  items(I), periods(P).
 
-#minimize { N : stock(N,P,I), items(I), periods(P) }.
+sum_stock (N) :- N = #sum{ M,I,P : stock(I,P,M) }.
 
 
-%#minimize { N : sum_dem(I,P,N1), sum_prod(I,P,N2), stocking_cost(I,M), N=M*(N2-N1),
-%                periods(P), items(I) }.
+#minimize { N : sum_stock(N) }.
 
-%#minimize { N : setup_cost(I1,I2,N), assign(P,I1), assign(P+1,I2), periods(P), periods(P+1),
-%                items(I1), items(I2) }.
 
-%#show assign/2.
-#show sum_prod/3.
+#show assign/2.
+%#show sum_dem/3.
+%#show stock/3.
+#show sum_stock/1.
