@@ -36,4 +36,83 @@ con la corrispondente soluzione ottima:
 [1, 1, 2, 2, 0, 0, 1, 1]
 \end{verbatim}
 di costo 569.
+\pagebreak
+
+\section*{Il modello MiniZinc}
+Riporto qui il codice diviso in parti, al termine di ogni frammento è presente un commento al codice.
+\begin{verbatim}
+include "globals.mzn";
+
+int: Periods;
+int: Items;
+array[1..Items,1..Periods] of 0..1: Demands;
+array[1..Items] of int: StockingCosts;
+array[1..Items,1..Items] of int: SetupCosts;
+\end{verbatim}
+Qui vengono inizializzate le strutture che servono a modellare l'input del problema. Inoltre è presente l'istruzione include che permetterà poi di utilizzare il vincolo globale $exactly$.
+
+\begin{verbatim}
+array[1..Items,1..Periods] of var 0..1: SolMatrix;        % Solution matrix
+array[1..Periods] of var 0..Items-1: Sol;                 % Output array
+\end{verbatim}
+$SolMatrix$ è una matrice $item\times period$ di ``0" e ``1". $s^i_p$ è uguale a 1 se e solo se nel periodo $p$ produco un item di tipo $i$. $Sol$ è un array di dimensione uguale al numero di periodi ed esprime, per ogni periodo, quale tipo di item viene prodotto.
+
+\begin{verbatim}
+% Schedule the production of exactly one item for each period
+constraint
+  forall (t in 1..Periods)
+    (exactly(1,[SolMatrix[i,t] | i in 1..Items],1));
+\end{verbatim}
+Questo primo insieme di vincoli costringe ad assegnare per ogni periodo di tempo esattamente un tipo di item da produrre. Ho fatto alcune prove esprimendo il vincolo in altri modi (ad esempio, vincolare la somma degli elementi di ogni colonna ad essere uguale a 1) ma i tempi erano sempre peggiori rispetto alla versione con l'$exactly$.
+\pagebreak
+
+\begin{verbatim}
+% Every item must be produced before the time for which it's requested
+constraint
+  forall (i in 1..Items, j in 1..Periods)
+    (sum (k in 1..j) (Demands[i,k]) <= sum (k in 1..j) (SolMatrix[i,k]));
+\end{verbatim}
+Questi vincoli esprimono \textbf{NoBacklog}, cioè la non possibilità di produrre un item in un periodo successivo a quello per il quale è richiesto.
+
+\begin{verbatim}
+% This constraint "links" SolMatrix and Sol
+constraint
+  forall(t in 1..Periods)
+    (sum (i in 1..Items)(i*SolMatrix[i,t]) == Sol[t]+1);
+\end{verbatim}
+Qui $SolMatrix$ e $Sol$ vengono ``collegati" per far corrispondere alla matrice l'array che sarà poi l'effettiva soluzione data in output.\\
+Sono state mantenute entrambe le strutture (anche se ridondanti) perchè lavorare solo utilizzando la matrice rallentava di molto il calcolo del valore della funzione obiettivo, mentre utilizzare solo l'array rendeva più lento il lavoro fatto dai primi due insiemi di vincoli presentati precedentemente. Utilizzando entrambe le strutture ho ottenuto i risultati migliori.
+
+\begin{verbatim}
+% Minimize the stocking costs (keeping an already produced item stored)
+%  and
+%  the setup costs (switching from producing a certain type of item
+%    to another)
+solve:: int_search([SolMatrix[i,j] | i in 1..Items, j in 1..Periods],
+                   occurrence, indomain_min, complete)
+minimize (
+  sum (i in 1..Items)
+    (StockingCosts[i] * sum(t in 1..Periods, j in 1..t)
+                          (SolMatrix[i,j]-Demands[i,j]))
+  +
+  sum (i in 1..Periods-1) (SetupCosts[Sol[i]+1,Sol[i+1]+1])
+);
+\end{verbatim}
+Qui sono presenti le annotazioni per la ricerca e la funzione obiettivo:\\
+La ricerca parte assegnando valori alla matrice $SolMatrix$ (altre possibilità sono state testate e sono risultate sensibilmente peggiori). L'euristica per la variable selection è $occurrence$, viene scelta la variabile più vincolata. Anche qui è stato visto sperimentalmente che è la scelta migliore. Per quanto riguarda value choice, $indomain\_min$ è chiaramente la migliore visto che la mia soluzione corrisponderà ad una matrice nella quale la maggioranza dei valori è 0.\\
+La funzione da minimizzare è la somma degli $stocking costs$ e dei $setup costs$. Qui si nota anche l'utilità di avere sia $SolMatrix$ che $Sol$.
+
+\begin{verbatim}
+output ["Cost: "++show (
+  sum (i in 1..Items)
+    (StockingCosts[i] * sum(t in 1..Periods, j in 1..t)
+                          (SolMatrix[i,j]-Demands[i,j]))
+  +
+  sum (i in 1..Periods-1) (SetupCosts[Sol[i]+1,Sol[i+1]+1])
+)++" "]
+++
+[show(Sol)]
+\end{verbatim}
+L'output è composto dal costo della soluzione trovata e dall'array che esprime la soluzione.
+
 \end{document}
