@@ -32,7 +32,7 @@ constraint
 
 % Minimize the stocking costs (keeping an already produced item stored) and
 %          the setup costs (switching from producing a certain type of item to another)
-solve:: int_search([SolMatrix[i,j] | i in 1..Items, j in 1..Periods], occurrence, indomain_min, complete)
+solve:: int_search([SolMatrix[i,j] | i in 1..Items, j in 1..Periods], first_fail, indomain_min, complete)
        minimize (
           sum (i in 1..Items) (StockingCosts[i] * sum(t in 1..Periods, j in 1..t)(SolMatrix[i,j]-Demands[i,j]))
           +
