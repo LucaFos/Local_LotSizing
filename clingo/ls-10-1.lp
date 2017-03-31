@@ -1,5 +1,5 @@
-items (1..2).
 periods (1..10).
+items (1..2).
 demand (2,1).
 demand (2,2).
 demand (1,4).
@@ -11,8 +11,8 @@ demand (2,9).
 demand (1,10).
 demand (2,10).
 
-%items (1..2).
 %periods (1..3).
+%items (1..2).
 %demand (1,1).
 %demand (2,2).
 %demand (1,3).

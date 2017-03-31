@@ -114,5 +114,86 @@ output ["Cost: "++show (
 [show(Sol)]
 \end{verbatim}
 L'output è composto dal costo della soluzione trovata e dall'array che esprime la soluzione.
+\pagebreak
+
+\section*{La codifica ASP}
+Riporto qui di seguito la codifica dell'istanza riportata a pagina 2:
+\begin{verbatim}
+periods (1..8).
+items (1..3).
+demand (2,3).
+demand (2,4).
+demand (1,6).
+demand (3,6).
+demand (2,7).
+demand (3,7).
+demand (1,8).
+demand (2,8).
+
+stocking_cost (1,10).
+stocking_cost (2,15).
+stocking_cost (3,12).
+
+setup_cost (X,X,0) :- items(X).
+setup_cost (1,2,131).
+setup_cost (1,3,109).
+setup_cost (2,1,193).
+setup_cost (2,3,175).
+setup_cost (3,1,101).
+setup_cost (3,2,136).
+\end{verbatim}
+La prima dichiarazione di $setup\_cost$ fa in modo di non avere costi di setup quando la macchina produce un altro $item$ dello stesso tipo che aveva prodotto in precedenza.
+
+\begin{verbatim}
+1 { assign(P,I) : items(I) } 1 :- periods(P).
+\end{verbatim}
+Qui vincolo $assign$ ad essere una funzione che assegna ad ogni periodo esattamente un $item$. Corrisponde al vettore $Sol$ del modello MiniZinc.
+\pagebreak
+
+\begin{verbatim}
+sum_prod(I,P,N) :- N = #count{ P1 : assign(P1,I), periods(P1), P1<=P },
+                   items(I), periods(P).
+
+sum_dem(I,P,N) :- N = #count{ P1 : demand(I,P1), periods(P1), P1<=P },
+                  items(I), periods(P).
+
+:- sum_dem(I,P,N1), sum_prod(I,P,N2), N1>N2, items(I), periods(P).
+\end{verbatim}
+Questo frammento esprime i vincoli hard del problema.\\
+$sum\_prod$ mi dice per ogni coppia $I$-$P$ quanti item di tipo $I$ sono stati prodotti fino al periodo $P$. $sum\_dem$ fa la stessa cosa ma invece di parlare degli item prodotti parla degli item richiesti fino al periodo $P$.\\
+L'ultima riga è il vincolo vero è proprio: assicura che per ogni coppia $item$-$period$ il numero di item di un certo tipo richiesti non superi il numero di quelli prodotti.
+
+\begin{verbatim}
+stock (I,P,N) :- N = #sum{ M : sum_dem(I,P,N1), sum_prod(I,P,N2),
+                           stocking_cost(I,C), M = C*(N2-N1) },
+                 items(I), periods(P).
+
+sum_stock (N) :- N = #sum{ M,I,P : stock(I,P,M) }.
+\end{verbatim}
+$stock$ conta per ogni periodo il numero di item di un certo tipo che sono stati prodotti ma per i quali non c'è stata ancora la corrispondente richiesta (non sono stati ``consumati"). A questo punto moltiplica questi valori per i costi di stoccaggio dei singoli item.\\
+$sum\_stock$ fa semplicemente la somma di tutti i costi calcolati precedentemente.
+
+\begin{verbatim}
+setup (P,N) :- N = #sum{ M : assign(P,I1), assign(P+1,I2),
+                         setup_cost(I1,I2,C), M = C },
+                   periods(P).
+
+sum_setup (N) :- N = #sum{ M,P : setup(P,M) }.
+\end{verbatim}
+$setup$ serve a calcolare i costi di setup per ognuno dei periodi, mentre $sum\_setup$ fa la somma di questi valori.
+\pagebreak
+
+\begin{verbatim}
+sum_total (N) :- N = N1+N2, sum_stock(N1), sum_setup(N2).
+
+#minimize { N : sum_total(N) }.
+\end{verbatim}
+Qui sommo i costi di stocking con quelli di setup, per poi minimizzare tale somma.
+
+\begin{verbatim}
+#show assign/2.
+#show sum_total/1.
+\end{verbatim}
+Stampo in output l'oggetto da produrre ad ogni periodo ($assign$) e il costo di tale soluzione ($sum\_total$).
 
 \end{document}

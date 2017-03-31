@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.3.11)  26 MAR 2017 14:57
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.3.11)  31 MAR 2017 13:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -148,7 +148,49 @@ Overfull \hbox (36.07521pt too wide) in paragraph at lines 100--100
 Periods],[] 
  []
 
-[4] [5] (./report.aux) ) 
+[4] [5]
+Overfull \hbox (1.68077pt too wide) in paragraph at lines 145--146
+\OT1/cmr/m/n/12 quando la macchina produce un altro $\OML/cmm/m/it/12 item$ \OT
+1/cmr/m/n/12 dello stesso tipo che aveva prodotto
+ []
+
+[6]
+Overfull \hbox (48.42522pt too wide) in paragraph at lines 161--161
+[]\OT1/cmtt/m/n/12 sum_prod(I,P,N) :- N = #count{ P1 : assign(P1,I), periods(P1
+), P1<=P },[] 
+ []
+
+
+Overfull \hbox (42.25021pt too wide) in paragraph at lines 161--161
+[]\OT1/cmtt/m/n/12 sum_dem(I,P,N) :- N = #count{ P1 : demand(I,P1), periods(P1)
+, P1<=P },[] 
+ []
+
+
+Overfull \hbox (17.5502pt too wide) in paragraph at lines 161--161
+[]\OT1/cmtt/m/n/12 :- sum_dem(I,P,N1), sum_prod(I,P,N2), N1>N2, items(I), perio
+ds(P).[] 
+ []
+
+
+Overfull \hbox (11.3752pt too wide) in paragraph at lines 172--172
+[]\OT1/cmtt/m/n/12 stock (I,P,N) :- N = #sum{ M : sum_dem(I,P,N1), sum_prod(I,P
+,N2),[] 
+ []
+
+
+Overfull \hbox (9.89111pt too wide) in paragraph at lines 173--175
+\OML/cmm/m/it/12 sum[]stock$ \OT1/cmr/m/n/12 fa semplicemente la somma di tutti
+ i costi calcolati precedentemente. 
+ []
+
+
+Overfull \hbox (9.72313pt too wide) in paragraph at lines 183--185
+$\OML/cmm/m/it/12 setup$ \OT1/cmr/m/n/12 serve a calcolare i costi di setup per
+ ognuno dei periodi, mentre $\OML/cmm/m/it/12 sum[]setup$
+ []
+
+[7] [8] (./report.aux) ) 
 Here is how much of TeX's memory you used:
  1010 strings out of 493029
  13015 string characters out of 6136234
@@ -165,10 +207,10 @@ usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/sh
 are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/tex
 live/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texlive/t
 exmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on report.pdf (5 pages, 96729 bytes).
+Output written on report.pdf (8 pages, 102157 bytes).
 PDF statistics:
- 52 PDF objects out of 1000 (max. 8388607)
- 36 compressed objects within 1 object stream
+ 63 PDF objects out of 1000 (max. 8388607)
+ 44 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
