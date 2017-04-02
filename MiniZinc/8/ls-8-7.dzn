@@ -1,0 +1,10 @@
+Periods = 8;
+Items = 2;
+
+Demands = [|0, 0, 1, 1, 1, 1, 1, 0
+           |0, 1, 0, 0, 1, 0, 0, 1|]; 
+
+StockingCosts = [14, 11]; 
+
+SetupCosts = [|0, 15
+              |14, 0|];
