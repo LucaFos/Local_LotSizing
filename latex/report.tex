@@ -142,7 +142,7 @@ setup_cost (2,3,175).
 setup_cost (3,1,101).
 setup_cost (3,2,136).
 \end{verbatim}
-La prima dichiarazione di $setup\_cost$ fa in modo di non avere costi di setup quando la macchina produce un altro $item$ dello stesso tipo che aveva prodotto in precedenza.
+La prima dichiarazione di $setup\_cost$ fa in modo di non avere costi di setup quando la macchina produce un altro $item$ dello stesso tipo che aveva prodotto in precedenza (si potrebbe fare a meno di questa dichiarazione).
 
 \begin{verbatim}
 1 { assign(P,I) : items(I) } 1 :- periods(P).
@@ -195,5 +195,43 @@ Qui sommo i costi di stocking con quelli di setup, per poi minimizzare tale somm
 #show sum_total/1.
 \end{verbatim}
 Stampo in output l'oggetto da produrre ad ogni periodo ($assign$) e il costo di tale soluzione ($sum\_total$).
+\pagebreak
+
+\section*{Test}
+Nella seguente tabella ho riportato nella prima colonna il nome dell'istanza, nelle altre due il tempo richiesto da MiniZinc (Gecode) e da Clingo:
+\let\centering\relax
+\begin{center}
+  \begin{tabular}{ | l | c | r | }
+    \hline
+    Istanza & MiniZinc & Clingo \\ \hline
+    8-1 & 13ms & 8.147s \\ \hline
+    8-2 & 15ms & 2.000s \\ \hline
+    8-3 & 15ms & 7.166s \\ \hline
+    8-4 & 16ms & 38.829s \\ \hline
+    8-5 & 16ms & 76.192s \\ \hline
+    8-6 & 16ms & 16.147s \\ \hline
+    8-7 & 16ms & 20.703s \\ \hline
+    8-8 & 18ms & 4.743s \\ \hline
+    10-1 & 15ms & 4.202s \\ \hline
+    10-2 & 16ms & 113.604s \\ \hline
+    10-3 & 16ms & 153.553s \\ \hline
+    10-4 & 15ms & 46.374s \\ \hline
+    10-5 & 16ms & 15.204s \\ \hline
+    10-6 & 17ms & 115.447s \\ \hline
+    10-7 & 16ms & 169.772s \\ \hline
+    10-8 & 18ms & 49.704s \\ \hline
+    20 & 938ms & - \\ \hline
+    25 & 47.270s & - \\ \hline
+    30 & 79.000s & - \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\noindent I nomi delle istanze corrispondono al numero di periodi presenti nell'istanza, ho testato 8 istanze contenenti 8 periodi, 8 da 10 e 3 istanze più grandi che ho fatto girare solo su MiniZinc in quanto Clingo richiedeva tempi superiori ai 5 minuti.\\
+Il numero di test effettuati è ridotto perchè mi sono reso conto che questo tipo di modelli non viene risolti velocemente da Clingo. Questo problema è dato fondamentalmente dagli stocking costs e dall'espressione che si usa nel modello per minimizzarli (l'espressione è la seguente: $M = C*(N2-N1)$ dove $(N2-N1)$ è la quantità di item in stock e C lo stocking cost di un singolo item).\\
+Una cosa che si nota è che quando gli stocking cost sono uguali (come nel caso dell'istanza 10-1) i tempi sono più bassi. Facendo qualche test più approfondito (usando il comando \texttt{--text}) si nota che il $grounding$ ha bisogno di molto tempo perchè deve istanziare un numero molto alto di ``stock", di conseguenza si ha un numero elevatissimo di ``sum\_total" (per l'istanza 8-1, più di 500.000). I costi di setup invece non sembrano essere un problema al pari degli stocking costs.\\
+
+\noindent Una possibile soluzione è quella di usare $Clingcon$, un answer set solver per programmi a vincoli. Si tratta di un'estensione che aggiunge ai tradizionali programmi logici la capacità di lavorare su vincoli in modo ``effettivo".\\
+Questo software è stato sviluppato a partire da $Clingo$ e $Gecode$
 
 \end{document}
