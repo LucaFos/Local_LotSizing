@@ -8,7 +8,7 @@ I seguenti dati vengono forniti per ogni istanza:
 \begin{itemize}
 \item Un insieme $I=\{0,\dots,m-1\}$ che rappresenta i tipi di oggetto che possono essere prodotti.
 \item Un insieme $P=\{0,\dots,p-1\}$ che rappresenta i periodi temporali (discreti) durante i quali produciamo un oggetto.
-\item Una matrice $I\times P$ (la chiamo $D$) tale che $d^i_t=1$ se un oggetto di tipo $i$ è richiesto al tempo $p$, $d^i_t=0$ altrimenti.
+\item Una matrice $I\times P$ (la chiamo $D$) tale che $d^{ip}=1$ se un oggetto di tipo $i$ è richiesto al tempo $p$, $d^{ip}=0$ altrimenti.
 \item Una matrice $I\times I$ (la chiamo $C$) tale che $c^{ij}$ rappresenta il costo che va pagato quando la macchina passa dalla produzione di un oggetto di tipo $i$ ad uno di tipo $j$ ($\forall i\ c^{ii}=0$).
 \item Un array $H$ di lunghezza $m$ tale che $h^i$ rappresenta il costo dato dal tenere in magazzino un oggetto di tipo $i$ per un periodo (una unità temporale).
 \end{itemize}
@@ -113,7 +113,7 @@ output ["Cost: "++show (
 ++
 [show(Sol)]
 \end{verbatim}
-L'output è composto dal costo della soluzione trovata e dall'array che esprime la soluzione.
+L'output è composto dal costo della soluzione trovata e dall'array che esprime tale soluzione.
 \pagebreak
 
 \section*{La codifica ASP}
@@ -170,8 +170,8 @@ stock (I,P,N) :- N = #sum{ M : sum_dem(I,P,N1), sum_prod(I,P,N2),
 
 sum_stock (N) :- N = #sum{ M,I,P : stock(I,P,M) }.
 \end{verbatim}
-$stock$ conta per ogni periodo il numero di item di un certo tipo che sono stati prodotti ma per i quali non c'è stata ancora la corrispondente richiesta (non sono stati ``consumati"). A questo punto moltiplica questi valori per i costi di stoccaggio dei singoli item.\\
-$sum\_stock$ fa semplicemente la somma di tutti i costi calcolati precedentemente.
+$stock$ conta per ogni periodo il numero di item di un certo tipo che sono stati prodotti ma per i quali non c'è stata ancora la corrispondente richiesta (non sono stati ancora ``consumati"). A questo punto moltiplica questi valori per i costi di stoccaggio dei singoli item.\\
+$sum\_stock$ fa la somma di tutti i costi calcolati precedentemente.
 
 \begin{verbatim}
 setup (P,N) :- N = #sum{ M : assign(P,I1), assign(P+1,I2),
@@ -194,7 +194,7 @@ Qui sommo i costi di stocking con quelli di setup, per poi minimizzare tale somm
 #show assign/2.
 #show sum_total/1.
 \end{verbatim}
-Stampo in output l'oggetto da produrre ad ogni periodo ($assign$) e il costo di tale soluzione ($sum\_total$).
+Stampo in output l'oggetto da produrre ad ogni periodo ($assign$) e il costo della corrispondente soluzione ($sum\_total$).
 \pagebreak
 
 \section*{Test}
@@ -228,10 +228,10 @@ Nella seguente tabella ho riportato nella prima colonna il nome dell'istanza, ne
 \end{center}
 
 \noindent I nomi delle istanze corrispondono al numero di periodi presenti nell'istanza, ho testato 8 istanze contenenti 8 periodi, 8 da 10 e 3 istanze più grandi che ho fatto girare solo su MiniZinc in quanto Clingo richiedeva tempi superiori ai 5 minuti.\\
-Il numero di test effettuati è ridotto perchè mi sono reso conto che questo tipo di modelli non viene risolti velocemente da Clingo. Questo problema è dato fondamentalmente dagli stocking costs e dall'espressione che si usa nel modello per minimizzarli (l'espressione è la seguente: $M = C*(N2-N1)$ dove $(N2-N1)$ è la quantità di item in stock e C lo stocking cost di un singolo item).\\
+Il numero di test effettuati è ridotto perchè mi sono reso conto che risolvere questo tipo di problemi richiede tempi molto lunghi utilizzando Clingo. Questo problema è dato fondamentalmente dagli stocking costs e dall'espressione che si usa nel modello per minimizzarli (l'espressione è la seguente: $M = C*(N2-N1)$ dove $(N2-N1)$ è la quantità di item in stock e C lo stocking cost di un singolo item).\\
 Una cosa che si nota è che quando gli stocking cost sono uguali (come nel caso dell'istanza 10-1) i tempi sono più bassi. Facendo qualche test più approfondito (usando il comando \texttt{--text}) si nota che il $grounding$ ha bisogno di molto tempo perchè deve istanziare un numero molto alto di ``stock", di conseguenza si ha un numero elevatissimo di ``sum\_total" (per l'istanza 8-1, più di 500.000). I costi di setup invece non sembrano essere un problema al pari degli stocking costs.\\
 
 \noindent Una possibile soluzione è quella di usare $Clingcon$, un answer set solver per programmi a vincoli. Si tratta di un'estensione che aggiunge ai tradizionali programmi logici la capacità di lavorare su vincoli in modo ``effettivo".\\
-Questo software è stato sviluppato a partire da $Clingo$ e $Gecode$
+Questo software è stato sviluppato a partire da $Clingo$ e $Gecode$.
 
 \end{document}
